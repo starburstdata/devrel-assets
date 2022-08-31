@@ -1,5 +1,3 @@
-# developer-blog
+# Starburst Developer Blog
 
-Repo for potential and in progress developer blog articles
-
-TBD
+Welcome to the [Starburst Developer Blog](https://www.starburst.io/blog/). This repository contains code, assets, etc. from our developer blogs.
