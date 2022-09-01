@@ -47,7 +47,7 @@ public interface JsonParser
     {
         return stream -> parse(stream)
                 .map(token -> switch (token) {
-                    case ObjectNameToken objectNameToken -> new ObjectNameToken(naming.apply(objectNameToken.name()));
+                    case ObjectNameToken(var name) -> new ObjectNameToken(naming.apply(name));
                     default -> token;
                 });
     }

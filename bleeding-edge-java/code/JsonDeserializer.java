@@ -61,11 +61,11 @@ public interface JsonDeserializer
                     throw new RuntimeException();
                 }
                 switch (jsonToken) {
-                    case JsonToken.NullToken ignore -> {
+                    case JsonToken.NullToken __ -> {
                         value = null;
                         valueIsSet = true;
                     }
-                    case JsonToken ignore when tokenClass.isAssignableFrom(jsonToken.getClass()) -> {
+                    case JsonToken __ when tokenClass.isAssignableFrom(jsonToken.getClass()) -> {
                         value = valueProvider.apply(tokenClass.cast(jsonToken));
                         valueIsSet = true;
                     }
@@ -127,7 +127,7 @@ public interface JsonDeserializer
                 if (expectingValue) {
                     expectingValue = false;
                     switch (jsonToken) {
-                        case JsonToken.EndArrayToken ignore -> {
+                        case JsonToken.EndArrayToken __ -> {
                             nextTypedDeserializer = accept(jsonToken);    // it's an empty array
                         }
                         default -> {
@@ -139,21 +139,21 @@ public interface JsonDeserializer
                 }
                 else {
                     switch (jsonToken) {
-                        case JsonToken.BeginArrayToken ignore -> {
+                        case JsonToken.BeginArrayToken __ -> {
                             if (started) {
                                 throw new RuntimeException();
                             }
                             started = true;
                             expectingValue = true;
                         }
-                        case JsonToken.EndArrayToken ignore -> {
+                        case JsonToken.EndArrayToken __ -> {
                             if (!started || isDone) {
                                 throw new RuntimeException();
                             }
                             nextTypedDeserializer = parentTypedDeserializer;
                             isDone = true;
                         }
-                        case JsonToken.ValueSeparatorToken ignore -> {
+                        case JsonToken.ValueSeparatorToken __ -> {
                             if (!started) {
                                 throw new RuntimeException();
                             }
@@ -195,7 +195,7 @@ public interface JsonDeserializer
             {
                 TypedDeserializer nextTypedDeserializer = this;
                 switch (jsonToken) {
-                    case JsonToken.BeginObjectToken ignore -> {
+                    case JsonToken.BeginObjectToken __ -> {
                         if (started) {
                             throw new RuntimeException();
                         }
@@ -203,11 +203,11 @@ public interface JsonDeserializer
                             started = true;
                         }
                     }
-                    case JsonToken.ObjectNameToken objectNameToken -> {
+                    case JsonToken.ObjectNameToken(var name) -> {
                         if (!started || (currentName != null)) {
                             throw new RuntimeException();
                         }
-                        currentName = objectNameToken.name();
+                        currentName = name;
                         RecordComponent recordComponent = recordComponentMap.get(currentName);
                         if (recordComponent == null) {
                             throw new RuntimeException();
@@ -216,14 +216,14 @@ public interface JsonDeserializer
                         valuesMap.put(currentName, typedDeserializer);
                         nextTypedDeserializer = typedDeserializer;
                     }
-                    case JsonToken.EndObjectToken ignore -> {
+                    case JsonToken.EndObjectToken __ -> {
                         if (!started || isDone) {
                             throw new RuntimeException();
                         }
                         nextTypedDeserializer = parentTypedDeserializer;
                         isDone = true;
                     }
-                    case JsonToken.ValueSeparatorToken ignore -> {
+                    case JsonToken.ValueSeparatorToken __ -> {
                         if (!started || (currentName == null)) {
                             throw new RuntimeException();
                         }

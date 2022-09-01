@@ -39,7 +39,7 @@ public interface JsonPrinter
     default JsonPrinter withNaming(JsonNaming naming)
     {
         return jsonToken -> switch (jsonToken) {
-            case ObjectNameToken objectNameToken -> JsonPrinter.this.print(new ObjectNameToken(naming.apply(objectNameToken.name())));
+            case ObjectNameToken(var name) -> JsonPrinter.this.print(new ObjectNameToken(naming.apply(name)));
             default -> JsonPrinter.this.print(jsonToken);
         };
     }
@@ -47,16 +47,16 @@ public interface JsonPrinter
     static CharSequence printStandard(JsonToken jsonToken)
     {
         return switch (jsonToken) {
-            case NumberToken numberToken -> numberToken.value().toString();
-            case StringToken stringToken -> StringUtils.quoteAndEscape(stringToken.value(), false);
-            case BooleanToken booleanToken -> booleanToken.value() ? "true" : "false";
-            case NullToken ignore -> "null";
-            case BeginArrayToken ignore -> "[";
-            case EndArrayToken ignore -> "]";
-            case BeginObjectToken ignore -> "{";
-            case EndObjectToken ignore -> "}";
-            case ObjectNameToken objectNameToken -> StringUtils.quoteAndEscape(objectNameToken.name(), true);
-            case ValueSeparatorToken ignore -> ",";
+            case NumberToken(var number) -> number.toString();
+            case StringToken(var string) -> StringUtils.quoteAndEscape(string, false);
+            case BooleanToken(var value) -> value ? "true" : "false";
+            case NullToken __ -> "null";
+            case BeginArrayToken __ -> "[";
+            case EndArrayToken __ -> "]";
+            case BeginObjectToken __ -> "{";
+            case EndObjectToken __ -> "}";
+            case ObjectNameToken(var name) -> StringUtils.quoteAndEscape(name, true);
+            case ValueSeparatorToken __ -> ",";
         };
     }
     default JsonPrinter pretty()

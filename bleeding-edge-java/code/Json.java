@@ -39,44 +39,42 @@ public interface Json
                         });
             }
 
-            @SuppressWarnings("unchecked")
             @Override
             public <T> T deserialize(TypeToken<T> type, String json)
             {
-                return (T) deserialize(type.type(), json);
+                return deserialize(type.type(), json);
             }
 
-            @SuppressWarnings("unchecked")
             @Override
             public <T> T deserialize(TypeToken<T> type, Reader reader)
             {
-                return (T) deserialize(type.type(), reader);
+                return deserialize(type.type(), reader);
             }
 
             @Override
             public <T> T deserialize(Class<T> type, String json)
             {
-                return type.cast(deserialize((Type) type, json));
+                return deserialize((Type) type, json);
             }
 
             @Override
             public <T> T deserialize(Class<T> type, Reader reader)
             {
-                return type.cast(deserialize((Type) type, reader));
+                return deserialize((Type) type, reader);
             }
 
-            @Override
-            public Object deserialize(Type type, String json)
+            @SuppressWarnings("unchecked")
+            private <T> T deserialize(Type type, String json)
             {
-                return parser.parse(json.chars())
+                return (T) parser.parse(json.chars())
                         .collect(JsonDeserializerCollector.deserializing(deserializer, type));
             }
 
-            @Override
-            public Object deserialize(Type type, Reader reader)
+            @SuppressWarnings("unchecked")
+            private <T> T deserialize(Type type, Reader reader)
             {
                 BufferedReader bufferedReader = new BufferedReader(reader);
-                return parser.parse(bufferedReader.lines().flatMapToInt(String::chars))
+                return (T) parser.parse(bufferedReader.lines().flatMapToInt(String::chars))
                         .collect(JsonDeserializerCollector.deserializing(deserializer, type));
             }
         };
@@ -90,11 +88,7 @@ public interface Json
 
     <T> T deserialize(Class<T> type, String json);
 
-    Object deserialize(Type type, String json);
-
     <T> T deserialize(TypeToken<T> type, Reader reader);
 
     <T> T deserialize(Class<T> type, Reader reader);
-
-    Object deserialize(Type type, Reader reader);
 }

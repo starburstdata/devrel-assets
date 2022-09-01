@@ -125,8 +125,8 @@ public interface JsonSerializer
             case OptionalLong optional -> Stream.of(optional.isPresent() ? new NumberToken(optional.getAsLong()) : new NullToken());
             case OptionalDouble optional -> Stream.of(optional.isPresent() ? new NumberToken(optional.getAsDouble()) : new NullToken());
             case Collection<?> collection -> serializeCollection(rootSerializer, collection);
-            case Object ignore when o.getClass().isArray() -> serializeArray(rootSerializer, o);
-            case Object ignore when o.getClass().isRecord() -> serializeRecord(rootSerializer, o, recordCache);
+            case Object __ when o.getClass().isArray() -> serializeArray(rootSerializer, o);
+            case Object __ when o.getClass().isRecord() -> serializeRecord(rootSerializer, o, recordCache);
             default -> null;
         };
         return Optional.ofNullable(tokenStream);

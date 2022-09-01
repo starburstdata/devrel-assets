@@ -26,7 +26,7 @@ public interface JsonSerializer
             case Enum<?> e -> Stream.of(new JsonToken.StringToken(e.name()));
             case Optional<?> optional -> lazySerialize(optional.orElse(null));
             case Collection<?> collection -> serializeCollection(collection);
-            case Object ignore when o.getClass().isRecord() ->serializeRecord(o);
+            case Object __ when o.getClass().isRecord() -> serializeRecord(o);
             default -> throw new IllegalArgumentException();    // we don't support this type
         };
     }

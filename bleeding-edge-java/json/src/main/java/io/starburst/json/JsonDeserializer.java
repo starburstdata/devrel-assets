@@ -140,11 +140,11 @@ public interface JsonDeserializer
                     throw new RuntimeException();
                 }
                 switch (jsonToken) {
-                    case NullToken ignore -> {
+                    case NullToken __ -> {
                         value = null;
                         valueIsSet = true;
                     }
-                    case JsonToken ignore when tokenClass.isAssignableFrom(jsonToken.getClass()) -> {
+                    case JsonToken __ when tokenClass.isAssignableFrom(jsonToken.getClass()) -> {
                         value = valueProvider.apply(tokenClass.cast(jsonToken));
                         valueIsSet = true;
                     }
@@ -218,7 +218,7 @@ public interface JsonDeserializer
                 if (expectingValue) {
                     expectingValue = false;
                     switch (jsonToken) {
-                        case EndArrayToken ignore -> nextTypedDeserializer = accept(jsonToken);    // it's an empty array
+                        case EndArrayToken __ -> nextTypedDeserializer = accept(jsonToken);    // it's an empty array
                         default -> {
                             TypedDeserializer valueTypedDeserializer = rootDeserializer.deserializerFor(this, componentType);
                             values.add(valueTypedDeserializer);
@@ -228,21 +228,21 @@ public interface JsonDeserializer
                 }
                 else {
                     switch (jsonToken) {
-                        case BeginArrayToken ignore -> {
+                        case BeginArrayToken __ -> {
                             if (started) {
                                 throw new RuntimeException();
                             }
                             started = true;
                             expectingValue = true;
                         }
-                        case EndArrayToken ignore -> {
+                        case EndArrayToken __ -> {
                             if (!started || isDone) {
                                 throw new RuntimeException();
                             }
                             nextTypedDeserializer = parentTypedDeserializer;
                             isDone = true;
                         }
-                        case ValueSeparatorToken ignore -> {
+                        case ValueSeparatorToken __ -> {
                             if (!started) {
                                 throw new RuntimeException();
                             }
@@ -318,11 +318,11 @@ public interface JsonDeserializer
                             started = true;
                         }
                     }
-                    case ObjectNameToken objectNameToken -> {
+                    case ObjectNameToken(var name) -> {
                         if (!started || (currentName != null)) {
                             throw new RuntimeException();    // TODO
                         }
-                        currentName = objectNameToken.name();
+                        currentName = name;
                         Type type = nameToType.apply(currentName);
                         TypedDeserializer typedDeserializer = rootDeserializer.deserializerFor(this, type);
                         values.add(new NameAndValue(currentName, typedDeserializer));

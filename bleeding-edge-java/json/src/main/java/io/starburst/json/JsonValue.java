@@ -81,10 +81,10 @@ public sealed interface JsonValue<T>
     {
         Stream.Builder<Stream<JsonToken>> builder = Stream.builder();
         switch (jsonValue) {
-            case JsonObject jsonObject -> {
+            case JsonObject(var value) -> {
                 builder.accept(Stream.of(BeginObjectToken.INSTANCE));
                 boolean first = true;
-                for (Map.Entry<String, ? extends JsonValue<?>> entry : jsonObject.value.entrySet()) {
+                for (Map.Entry<String, ? extends JsonValue<?>> entry : value.entrySet()) {
                     if (first) {
                         first = false;
                     }
@@ -96,17 +96,17 @@ public sealed interface JsonValue<T>
                 }
                 builder.accept(Stream.of(EndObjectToken.INSTANCE));
             }
-            case JsonArray jsonArray -> {
+            case JsonArray(var value) -> {
                 builder.accept(Stream.of(BeginArrayToken.INSTANCE));
                 boolean first = true;
-                for (JsonValue<?> value : jsonArray.value()) {
+                for (JsonValue<?> item : value) {
                     if (first) {
                         first = false;
                     }
                     else {
                         builder.accept(Stream.of(ValueSeparatorToken.INSTANCE));
                     }
-                    builder.accept(StreamUtil.lazyStream(() -> serializeJsonValue(value)));
+                    builder.accept(StreamUtil.lazyStream(() -> serializeJsonValue(item)));
                 }
                 builder.accept(Stream.of(EndArrayToken.INSTANCE));
             }
