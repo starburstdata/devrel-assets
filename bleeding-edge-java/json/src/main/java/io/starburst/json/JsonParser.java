@@ -28,6 +28,7 @@ import io.starburst.json.JsonToken.ValueSeparatorToken;
 import io.starburst.json.util.StringUtils;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.PrimitiveIterator;
 import java.util.Spliterators;
 import java.util.stream.IntStream;
@@ -57,9 +58,8 @@ public interface JsonParser
         Iterator<JsonToken> tokenIterator = new Iterator<>() {
             private final PrimitiveIterator.OfInt iterator = stream.iterator();
             private final StringBuilder builder = new StringBuilder();
-            private StringToken previousStringToken;
+            private final LinkedList<JsonToken> tokens = new LinkedList<>();
             private int pushedBack = -1;
-            private JsonToken nextToken;
 
             {
                 advanceToNextToken();
@@ -68,24 +68,16 @@ public interface JsonParser
             @Override
             public boolean hasNext()
             {
-                return (previousStringToken != null) || (nextToken != null);
+                return !tokens.isEmpty();
             }
 
             @Override
             public JsonToken next()
             {
-                JsonToken result;
-                if (previousStringToken != null) {
-                    result = previousStringToken;
-                    previousStringToken = null;
-                }
-                else {
-                    result = nextToken;
-                    nextToken = null;
-                }
-                if (result == null) {
+                if (tokens.isEmpty()) {
                     throw new RuntimeException();
                 }
+                JsonToken result = tokens.removeFirst();
                 advanceToNextToken();
                 return result;
             }
@@ -97,6 +89,7 @@ public interface JsonParser
                 }
 
                 String possibleObjectName = null;
+                JsonToken nextToken = null;
                 while ((nextToken == null) && ((pushedBack >= 0) || iterator.hasNext())) {
                     char c = (char) (((pushedBack >= 0) ? pushedBack : iterator.nextInt()) & 0xffff);
                     pushedBack = -1;
@@ -135,7 +128,10 @@ public interface JsonParser
                 }
                 if (possibleObjectName != null) {
                     // wasn't an object name - we now have to emit this string token first
-                    previousStringToken = new StringToken(possibleObjectName);
+                    tokens.add(new StringToken(possibleObjectName));
+                }
+                if (nextToken != null) {
+                    tokens.add(nextToken);
                 }
             }
         };
